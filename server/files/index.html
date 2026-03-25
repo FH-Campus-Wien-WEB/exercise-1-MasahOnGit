@@ -7,10 +7,6 @@
     <title>Movies!</title>
     <link rel="stylesheet" href="styles.css">
     <script>
-        function reverseString(s) {
-            return s.split("").reverse().join("");
-        }
-
         window.onload = function () {
             const xhr = new XMLHttpRequest()
             xhr.onload = function () {
@@ -21,54 +17,67 @@
 
                     // Loop through each movie
                     movies.forEach(movie => {
-                        // Container for layout
-                        const container = document.createElement('div');
-                        container.className = 'container';
+                        // Single main container (no double wrapping!)
+                        const main = document.createElement('main');
+                        main.className = 'movie-main';
 
-                        // Grid wrapper
-                        const grid = document.createElement('div');
-                        grid.className = 'movie-grid';
+                        main.innerHTML = `
+        <article class="movie-card" aria-labelledby="title-${movie.Title.replace(/[^a-zA-Z0-9]/g, '')}">
+            <!-- Poster -->
+            <figure class="poster-wrapper">
+                <img src="${movie.Poster}" alt="${movie.Title} poster" class="poster" loading="lazy">
+                <figcaption class="sr-only">Poster image for ${movie.Title}</figcaption>
+            </figure>
 
-                        // Movie card with your CSS classes
-                        const card = document.createElement('div');
-                        card.className = 'movie-card';
+            <!-- Header -->
+            <header>
+                <h1 id="title-${movie.Title.replace(/[^a-zA-Z0-9]/g, '')}" class="movie-title">${movie.Title}</h1>
+                <div class="movie-meta">
+                    <time datetime="${movie.Released}">📅 ${movie.Released}</time>
+                    <span aria-label="Runtime">⏱️ ${movie.Runtime}min</span>
+                    <span class="rating" aria-label="IMDb ${movie.imdbRating}/10">⭐ ${movie.imdbRating}</span>
+                </div>
+            </header>
 
-                        card.innerHTML = `
-        <img src="${movie.Poster}" alt="${movie.Title}" class="poster">
-        <h1 class="movie-title">${movie.Title}</h1>
-        <div class="movie-meta">
-            <span>📅 ${movie.Released}</span>
-            <span>⏱️ ${movie.Runtime}min</span>
-            <span class="rating">⭐ ${movie.imdbRating}</span>
-        </div>
-        <p class="plot">${movie.Plot}</p>
-        <div class="genres">
-            ${movie.Genres.map(g => `<span class="genre-tag">${g}</span>`).join('')}
-        </div>
-        <div class="credits-section">
-            <div class="credit-item">
-                <div class="credit-label">Directors</div>
-                <div class="credit-value">${movie.Directors.join(', ')}</div>
-            </div>
-            <div class="credit-item">
-                <div class="credit-label">Writers</div>
-                <div class="credit-value">${movie.Writers.join(', ')}</div>
-            </div>
-            <div class="credit-item">
-                <div class="credit-label">Actors</div>
-                <div class="credit-value">${movie.Actors.slice(0, 3).join(', ')}...</div>
-            </div>
-            <div class="credit-item">
-                <div class="credit-label">Metascore</div>
-                <div class="credit-value">${movie.Metascore}</div>
-            </div>
-        </div>
+            <!-- Plot -->
+            <section aria-label="Plot summary">
+                <p class="plot">${movie.Plot}</p>
+            </section>
+
+            <!-- Genres -->
+            <section aria-label="Genres">
+                <ul class="genres" role="list">
+                    ${movie.Genres.map(g => `<li class="genre-tag">${g}</li>`).join('')}
+                </ul>
+            </section>
+
+            <!-- Credits -->
+            <aside aria-label="Production credits">
+                <dl class="credits-section">
+                    <div>
+                        <dt>Directors</dt>
+                        <dd>${movie.Directors.join(', ')}</dd>
+                    </div>
+                    <div>
+                        <dt>Writers</dt>
+                        <dd>${movie.Writers.join(', ')}</dd>
+                    </div>
+                    <div>
+                        <dt>Actors</dt>
+                        <dd>${movie.Actors.slice(0, 3).join(', ')}${movie.Actors.length > 3 ? ' et al.' : ''}</dd>
+                    </div>
+                    <div>
+                        <dt>Metascore</dt>
+                        <dd>${movie.Metascore}</dd>
+                    </div>
+                </dl>
+            </aside>
+        </article>
     `;
 
-                        grid.appendChild(card);
-                        container.appendChild(grid);
-                        bodyElement.appendChild(container);
+                        bodyElement.appendChild(main);  // Single append!
                     });
+
 
                 } else {
                     bodyElement.append("Daten konnten nicht geladen werden, Status " + xhr.status + " - " + xhr.statusText)

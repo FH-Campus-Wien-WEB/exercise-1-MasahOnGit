@@ -8,15 +8,12 @@ app.use(express.static(path.join(__dirname, 'files')));
 app.get('/movies', async function (req, res) {
     try {
         const apiKey = 'e3a1f2a7';
-        const movieTitles = ['Tenet', 'Inception', 'Interstellar']; // ✅ PROVEN
+        const movieTitles = ['Tenet', 'Inception', 'Interstellar'];
         const movies = [];
 
         for (const title of movieTitles) {
-            console.log(`Fetching: ${title}`); // DEBUG
             const response = await fetch(`http://www.omdbapi.com/?t=${encodeURIComponent(title)}&apikey=${apiKey}`);
             const data = await response.json();
-
-            console.log(`${title}: Response=${data.Response}, Error=${data.Error}`); // DEBUG
 
             if (data.Response === 'True') {
                 movies.push({
@@ -34,8 +31,6 @@ app.get('/movies', async function (req, res) {
                 });
             }
         }
-
-        console.log(`Found ${movies.length} movies`); // DEBUG
         res.json(movies);
     } catch (error) {
         console.error('API Error:', error);
